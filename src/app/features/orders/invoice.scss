@@ -1,0 +1,218 @@
+// Накладная всегда светлая, независимо от темы приложения
+:host {
+  display: block;
+  min-height: 100vh;
+  padding: 24px 16px 48px;
+  box-sizing: border-box;
+  color-scheme: light;
+  color: #14161a;
+  background: #e9ecf2;
+  font: 400 14px/1.5 Roboto, sans-serif;
+}
+
+p {
+  margin: 0;
+}
+
+.muted {
+  color: #5b6170;
+}
+
+.strong {
+  font-weight: 600;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.state {
+  text-align: center;
+  color: #5b6170;
+}
+
+// Лист A4
+.sheet {
+  max-width: 794px;
+  margin: 0 auto;
+  padding: 48px 56px;
+  box-sizing: border-box;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 10px 40px rgb(20 22 26 / 0.12);
+}
+
+.top {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  padding-bottom: 24px;
+  border-bottom: 2px solid #14161a;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  font-size: 22px;
+  font-weight: 700;
+  color: #fff;
+  background: #4263eb;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+.store {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.doc {
+  text-align: right;
+
+  h1 {
+    margin: 0 0 4px;
+    font-size: 22px;
+  }
+}
+
+.parties {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+  margin: 24px 0;
+
+  h2 {
+    margin: 0 0 6px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #5b6170;
+  }
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th,
+  td {
+    padding: 10px 8px;
+    border-bottom: 1px solid #dde1e9;
+    text-align: left;
+  }
+
+  thead th {
+    font-size: 12px;
+    font-weight: 600;
+    color: #5b6170;
+    border-bottom: 1px solid #14161a;
+  }
+
+  tfoot th,
+  tfoot td {
+    border-bottom: none;
+    border-top: 2px solid #14161a;
+    font-weight: 700;
+  }
+}
+
+.n {
+  width: 28px;
+  color: #5b6170;
+}
+
+.num {
+  text-align: right !important;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.total {
+  font-size: 18px;
+}
+
+.note {
+  margin-top: 16px;
+  padding: 10px 12px;
+  border-left: 3px solid #4263eb;
+  background: #f4f6fb;
+}
+
+.signatures {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 48px;
+  margin-top: 56px;
+
+  .line {
+    display: block;
+    height: 32px;
+    border-bottom: 1px solid #14161a;
+  }
+
+  p {
+    margin-top: 6px;
+    font-size: 12px;
+  }
+}
+
+.bottom {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 40px;
+  padding-top: 16px;
+  border-top: 1px solid #dde1e9;
+  font-size: 12px;
+}
+
+@media (max-width: 699px) {
+  .sheet {
+    padding: 24px 20px;
+  }
+  .top,
+  .bottom {
+    flex-direction: column;
+  }
+  .doc {
+    text-align: left;
+  }
+  .parties {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+// При печати — только лист, без фона, тени и кнопок
+@media print {
+  :host {
+    padding: 0;
+    background: none;
+  }
+  .toolbar {
+    display: none;
+  }
+  .sheet {
+    max-width: none;
+    padding: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+}
+
+@page {
+  size: A4;
+  margin: 16mm;
+}

@@ -1,0 +1,25 @@
+@use '../../shared/list-page';
+
+table {
+  min-width: 720px;
+}
+
+a {
+  color: var(--app-active-text);
+}
+
+a.sub {
+  color: var(--app-muted);
+}
+
+// Имя клиента — ссылка на его карточку
+a.name {
+  display: inline-block;
+  color: var(--app-text);
+  text-decoration: none;
+
+  &:hover {
+    color: var(--app-active-text);
+    text-decoration: underline;
+  }
+}

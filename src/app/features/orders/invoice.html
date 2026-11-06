@@ -1,0 +1,104 @@
+<div class="toolbar">
+  <button mat-flat-button (click)="print()" [disabled]="!order()">
+    <mat-icon>print</mat-icon>
+    {{ 'Друкувати' | t }}
+  </button>
+  <button mat-button (click)="close()">{{ 'Закрити' | t }}</button>
+</div>
+
+@if (!ready()) {
+  <p class="state">{{ 'Завантаження…' | t }}</p>
+} @else if (order(); as o) {
+  <article class="sheet" [attr.aria-label]="'Накладна №{n}' | t: { n: o.number }">
+    <header class="top">
+      <div class="brand">
+        <span class="logo" aria-hidden="true">S</span>
+        <div>
+          <p class="store">ShopMaster</p>
+          <p class="muted">{{ 'Інтернет-магазин' | t }}</p>
+        </div>
+      </div>
+      <div class="doc">
+        <h1>{{ 'Накладна №{n}' | t: { n: o.number } }}</h1>
+        <p class="muted">{{ 'від {date}' | t: { date: date(o.createdAt) } }}</p>
+        <p class="muted">{{ 'Статус: {status}' | t: { status: (statusLabel.get(o.status) ?? '' | t) } }}</p>
+      </div>
+    </header>
+
+    <section class="parties">
+      <div>
+        <h2>{{ 'Продавець' | t }}</h2>
+        <p class="strong">ShopMaster</p>
+      </div>
+      <div>
+        <h2>{{ 'Покупець' | t }}</h2>
+        <p class="strong">{{ o.customerName }}</p>
+        @if (o.customerPhone) {
+          <p>{{ o.customerPhone }}</p>
+        }
+        @if (o.customerEmail) {
+          <p>{{ o.customerEmail }}</p>
+        }
+      </div>
+      <div>
+        <h2>{{ 'Адреса доставки' | t }}</h2>
+        <p>{{ o.address || '—' }}</p>
+      </div>
+    </section>
+
+    <table>
+      <thead>
+        <tr>
+          <th scope="col" class="n">#</th>
+          <th scope="col">{{ 'Товар' | t }}</th>
+          <th scope="col">{{ 'Артикул' | t }}</th>
+          <th scope="col" class="num">{{ 'Кількість' | t }}</th>
+          <th scope="col" class="num">{{ 'Ціна' | t }}</th>
+          <th scope="col" class="num">{{ 'Сума' | t }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (i of o.items; track i.productId; let n = $index) {
+          <tr>
+            <td class="n">{{ n + 1 }}</td>
+            <td>{{ i.name }}</td>
+            <td class="muted">{{ i.sku }}</td>
+            <td class="num">{{ i.qty }}</td>
+            <td class="num">{{ money(i.price) }}</td>
+            <td class="num">{{ money(i.price * i.qty) }}</td>
+          </tr>
+        }
+      </tbody>
+      <tfoot>
+        <tr>
+          <th scope="row" colspan="3">{{ 'Разом' | t }}</th>
+          <td class="num">{{ count() }}</td>
+          <td></td>
+          <td class="num total">{{ money(o.total) }}</td>
+        </tr>
+      </tfoot>
+    </table>
+
+    @if (o.note) {
+      <p class="note">{{ 'Примітка: {note}' | t: { note: o.note } }}</p>
+    }
+
+    <section class="signatures">
+      <div>
+        <span class="line"></span>
+        <p class="muted">{{ 'Відпустив' | t }}</p>
+      </div>
+      <div>
+        <span class="line"></span>
+        <p class="muted">{{ 'Отримав' | t }}</p>
+      </div>
+    </section>
+
+    <footer class="bottom">
+      <p>{{ 'Дякуємо за покупку!' | t }}</p>
+      <p class="muted">{{ 'Надруковано {date}' | t: { date: printedAt } }}</p>
+    </footer>
+  </article>
+} @else {
+  <p class="state">{{ 'Замовлення не знайдено' | t }}</p>
+}

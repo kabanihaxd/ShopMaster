@@ -1,0 +1,113 @@
+<a mat-button routerLink="/customers" class="back">
+  <mat-icon>arrow_back</mat-icon>
+  {{ 'Усі клієнти' | t }}
+</a>
+
+@if (loading() && !customer()) {
+  <mat-progress-bar mode="indeterminate" [attr.aria-label]="'Завантаження…' | t" />
+} @else if (customer(); as c) {
+  <section class="profile rise" aria-labelledby="customer-name">
+    <span class="avatar" aria-hidden="true">{{ initials() }}</span>
+    <div class="info">
+      <h2 id="customer-name">{{ c.name }}</h2>
+      <ul class="contacts">
+        @if (c.email) {
+          <li>
+            <mat-icon aria-hidden="true">mail</mat-icon>
+            <a [href]="'mailto:' + c.email">{{ c.email }}</a>
+          </li>
+        }
+        @if (c.phone) {
+          <li>
+            <mat-icon aria-hidden="true">call</mat-icon>
+            <a [href]="'tel:' + c.phone">{{ c.phone }}</a>
+          </li>
+        }
+        @if (c.address) {
+          <li>
+            <mat-icon aria-hidden="true">location_on</mat-icon>
+            {{ c.address }}
+          </li>
+        }
+        @if (since(); as s) {
+          <li>
+            <mat-icon aria-hidden="true">event</mat-icon>
+            {{ 'Клієнт з {date}' | t: { date: s } }}
+          </li>
+        }
+      </ul>
+    </div>
+    <button mat-flat-button (click)="createOrder()">
+      <mat-icon>add_shopping_cart</mat-icon>
+      {{ 'Створити замовлення' | t }}
+    </button>
+  </section>
+
+  <section aria-labelledby="customer-stats">
+    <h2 id="customer-stats" class="sr-only">{{ 'Показники клієнта' | t }}</h2>
+    <div class="stats">
+      @for (s of stats(); track s.label; let i = $index) {
+        <app-stat-card
+          class="rise"
+          [style.--i]="i + 1"
+          [label]="s.label"
+          [amount]="s.amount"
+          [format]="s.format"
+          [icon]="s.icon"
+          [tone]="s.tone"
+          [value]="s.value"
+        />
+      }
+    </div>
+  </section>
+
+  <div class="row">
+    <app-panel heading="Історія замовлень" class="rise" style="--i: 5">
+      @if (orders().length) {
+        <ul class="orders">
+          @for (o of orders(); track o.id) {
+            <li>
+              <button type="button" class="link" (click)="open(o)">
+                <span class="main">
+                  <span class="title">№{{ o.number }}</span>
+                  <span class="sub">{{ date(o) }} · {{ 'Товарів: {n}' | t: { n: items(o) } }}</span>
+                </span>
+                <span class="side">
+                  <span class="sum">{{ money(o.total) }}</span>
+                  <app-status-badge [status]="o.status" />
+                </span>
+              </button>
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="empty">{{ 'Клієнт ще нічого не замовляв' | t }}</p>
+      }
+    </app-panel>
+
+    <app-panel heading="Улюблені товари" class="rise" style="--i: 6">
+      @if (favorites().length) {
+        <ol class="favorites">
+          @for (p of favorites(); track p.productId; let i = $index) {
+            <li>
+              <span class="rank" aria-hidden="true">{{ i + 1 }}</span>
+              <span class="main">
+                <span class="title">{{ p.name }}</span>
+                <span class="sub">{{ 'Куплено: {n} шт.' | t: { n: p.qty } }}</span>
+              </span>
+              <span class="sum">{{ money(p.revenue) }}</span>
+            </li>
+          }
+        </ol>
+      } @else {
+        <p class="empty">{{ 'Покупок ще немає' | t }}</p>
+      }
+    </app-panel>
+  </div>
+} @else {
+  <div class="not-found">
+    <mat-icon aria-hidden="true">person_off</mat-icon>
+    <p>{{ 'Клієнта не знайдено' | t }}</p>
+    <a mat-flat-button routerLink="/customers">{{ 'До списку клієнтів' | t }}</a>
+  </div>
+}

@@ -1,0 +1,86 @@
+<div class="tools">
+  <app-lang-switch />
+  <app-theme-toggle />
+</div>
+
+<main class="page">
+  <mat-card appearance="outlined" class="card">
+    <mat-card-content>
+      <div class="brand">
+        <span class="logo" aria-hidden="true"><mat-icon>shopping_bag</mat-icon></span>
+        <div>
+          <p class="name">ShopMaster</p>
+          <p class="sub">{{ 'Адмін-панель' | t }}</p>
+        </div>
+      </div>
+
+      <h1>{{ 'Вхід до адмін-панелі' | t }}</h1>
+
+      @if (configured) {
+        <form [formRoot]="loginForm" class="form">
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'Пошта' | t }}</mat-label>
+            <input matInput type="email" autocomplete="username" [formField]="loginForm.email" />
+            @if (loginForm.email().errors()[0]; as error) {
+              <mat-error>{{ error.message ?? '' | t }}</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'Пароль' | t }}</mat-label>
+            <input
+              matInput
+              [type]="showPassword() ? 'text' : 'password'"
+              autocomplete="current-password"
+              [formField]="loginForm.password"
+            />
+            <button
+              mat-icon-button
+              matSuffix
+              type="button"
+              (click)="showPassword.set(!showPassword())"
+              [attr.aria-label]="(showPassword() ? 'Сховати пароль' : 'Показати пароль') | t"
+              [attr.aria-pressed]="showPassword()"
+            >
+              <mat-icon>{{ showPassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+            @if (loginForm.password().errors()[0]; as error) {
+              <mat-error>{{ error.message ?? '' | t }}</mat-error>
+            }
+          </mat-form-field>
+
+          <div role="status" aria-live="polite">
+            @if (notice(); as n) {
+              <p class="notice" [class.error]="n.kind === 'error'">
+                <mat-icon aria-hidden="true">{{ n.kind === 'error' ? 'error' : 'mark_email_read' }}</mat-icon>
+                {{ n.key | t: { email: n.email } }}
+              </p>
+            }
+          </div>
+
+          <button mat-flat-button type="submit" [disabled]="loginForm().submitting()">
+            {{ (loginForm().submitting() ? 'Вхід…' : 'Увійти') | t }}
+          </button>
+          <button mat-button type="button" (click)="resetPassword()">
+            {{ 'Забули пароль?' | t }}
+          </button>
+        </form>
+        <p class="hint">{{ 'Облікові записи менеджерів створюються в Firebase Console.' | t }}</p>
+      } @else {
+        <div class="setup">
+          <mat-icon aria-hidden="true">info</mat-icon>
+          <div>
+            <h2>{{ 'Firebase ще не налаштовано' | t }}</h2>
+            <p>
+              {{
+                'Вставте ключі проєкту у файл src/app/core/firebase-config.ts. Поки що адмін-панель працює в демо-режимі без входу.'
+                  | t
+              }}
+            </p>
+          </div>
+        </div>
+        <a mat-flat-button routerLink="/dashboard">{{ 'Відкрити демо' | t }}</a>
+      }
+    </mat-card-content>
+  </mat-card>
+</main>

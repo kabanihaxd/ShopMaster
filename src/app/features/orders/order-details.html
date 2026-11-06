@@ -1,0 +1,109 @@
+@let o = order();
+<h2 mat-dialog-title class="title">
+  {{ 'Замовлення №{n}' | t: { n: o.number } }}
+  <app-status-badge [status]="o.status" />
+</h2>
+
+<mat-dialog-content>
+  <p class="muted">{{ created() }}</p>
+
+  <section class="block" aria-labelledby="customer-title">
+    <h3 id="customer-title">{{ 'Клієнт' | t }}</h3>
+    <p class="strong">
+      @if (o.customerId) {
+        <a [routerLink]="['/customers', o.customerId]" mat-dialog-close>{{ o.customerName }}</a>
+      } @else {
+        {{ o.customerName }}
+      }
+    </p>
+    @if (o.customerEmail) {
+      <p><a [href]="'mailto:' + o.customerEmail">{{ o.customerEmail }}</a></p>
+    }
+    @if (o.customerPhone) {
+      <p><a [href]="'tel:' + o.customerPhone">{{ o.customerPhone }}</a></p>
+    }
+    <p>{{ o.address }}</p>
+    @if (o.note) {
+      <p class="muted">{{ 'Примітка: {note}' | t: { note: o.note } }}</p>
+    }
+  </section>
+
+  <section class="block" aria-labelledby="items-title">
+    <h3 id="items-title">{{ 'Склад замовлення' | t }}</h3>
+    <table class="items">
+      <thead>
+        <tr>
+          <th scope="col">{{ 'Товар' | t }}</th>
+          <th scope="col" class="num">{{ 'Кількість' | t }}</th>
+          <th scope="col" class="num">{{ 'Сума' | t }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (i of o.items; track i.productId) {
+          <tr>
+            <td>
+              {{ i.name }}
+              <span class="muted small">{{ i.sku }} · {{ money(i.price) }}</span>
+            </td>
+            <td class="num">{{ i.qty }}</td>
+            <td class="num">{{ money(i.price * i.qty) }}</td>
+          </tr>
+        }
+      </tbody>
+      <tfoot>
+        <tr>
+          <th scope="row" colspan="2">{{ 'Разом' | t }}</th>
+          <td class="num strong">{{ money(o.total) }}</td>
+        </tr>
+      </tfoot>
+    </table>
+  </section>
+
+  <section class="block" aria-labelledby="history-title">
+    <h3 id="history-title">{{ 'Історія' | t }}</h3>
+    <ol class="timeline">
+      @for (h of history(); track $index) {
+        <li [class.current]="$last">
+          <span class="dot" aria-hidden="true"></span>
+          <app-status-badge [status]="h.status" />
+          <time [attr.datetime]="h.iso">{{ h.when }}</time>
+          @if (h.by) {
+            <span class="by">{{ h.by }}</span>
+          }
+        </li>
+      }
+    </ol>
+  </section>
+
+  @if (options().length) {
+    <section class="block status" aria-labelledby="status-title">
+      <h3 id="status-title">{{ 'Змінити статус' | t }}</h3>
+      <div class="status-row">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>{{ 'Новий статус' | t }}</mat-label>
+          <mat-select [value]="next()" (valueChange)="next.set($event)">
+            @for (s of options(); track s) {
+              <mat-option [value]="s">{{ statusLabel.get(s) ?? '' | t }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        <button mat-flat-button [disabled]="!next() || saving()" (click)="apply()">
+          {{ (saving() ? 'Збереження…' : 'Застосувати') | t }}
+        </button>
+      </div>
+      @if (error()) {
+        <p class="error" role="alert">{{ 'Не вдалося змінити статус. Спробуйте ще раз.' | t }}</p>
+      }
+    </section>
+  } @else {
+    <p class="muted">{{ 'Замовлення завершено — статус більше не змінюється.' | t }}</p>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="print()">
+    <mat-icon>print</mat-icon>
+    {{ 'Друк накладної' | t }}
+  </button>
+  <button mat-button mat-dialog-close>{{ 'Закрити' | t }}</button>
+</mat-dialog-actions>

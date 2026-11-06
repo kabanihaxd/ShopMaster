@@ -1,0 +1,62 @@
+<div class="field">
+  <mat-icon aria-hidden="true">search</mat-icon>
+  <input
+    type="text"
+    role="combobox"
+    aria-autocomplete="list"
+    aria-expanded="true"
+    aria-controls="palette-list"
+    [attr.aria-activedescendant]="flat().length ? 'palette-option-' + active() : null"
+    [attr.aria-label]="'Пошук' | t"
+    [placeholder]="'Пошук замовлень, товарів, клієнтів…' | t"
+    [value]="query()"
+    (input)="query.set($any($event.target).value)"
+    (keydown)="onKeydown($event)"
+    autocomplete="off"
+    spellcheck="false"
+  />
+  <kbd aria-hidden="true">Esc</kbd>
+</div>
+
+<div #list id="palette-list" class="results" role="listbox" [attr.aria-label]="'Результати пошуку' | t">
+  @for (g of groups(); track g.key) {
+    <div role="group" [attr.aria-labelledby]="'palette-group-' + g.key">
+      <div class="group-title" role="presentation" [id]="'palette-group-' + g.key">{{ g.title | t }}</div>
+      @for (item of g.items; track item.key) {
+        <div
+          class="option"
+          role="option"
+          [id]="'palette-option-' + item.index"
+          [attr.aria-selected]="item.index === active()"
+          [class.active]="item.index === active()"
+          [style.--d]="item.index * 25 + 'ms'"
+          (mousemove)="active.set(item.index)"
+          (click)="choose(item)"
+        >
+          <span class="icon" aria-hidden="true"><mat-icon>{{ item.icon }}</mat-icon></span>
+          <span class="text">
+            <span class="title">{{ item.title }}</span>
+            @if (item.sub) {
+              <span class="sub">{{ item.sub }}</span>
+            }
+          </span>
+          @if (item.meta) {
+            <span class="meta">{{ item.meta }}</span>
+          }
+          <mat-icon class="enter" aria-hidden="true">keyboard_return</mat-icon>
+        </div>
+      }
+    </div>
+  } @empty {
+    <div class="nothing" role="presentation">
+      <mat-icon aria-hidden="true">search_off</mat-icon>
+      {{ 'Нічого не знайдено' | t }}
+    </div>
+  }
+</div>
+
+<div class="footer" aria-hidden="true">
+  <span><kbd>↑</kbd><kbd>↓</kbd> {{ 'вибір' | t }}</span>
+  <span><kbd>Enter</kbd> {{ 'відкрити' | t }}</span>
+  <span><kbd>Esc</kbd> {{ 'закрити' | t }}</span>
+</div>

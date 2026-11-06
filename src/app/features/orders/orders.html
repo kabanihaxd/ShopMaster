@@ -1,0 +1,139 @@
+<div class="head">
+  <p class="count" role="status">{{ 'Знайдено: {n}' | t: { n: visible().length } }}</p>
+  <button mat-flat-button (click)="create()">
+    <mat-icon>add</mat-icon>
+    {{ 'Створити замовлення' | t }}
+  </button>
+</div>
+
+<div class="filters">
+  <mat-form-field appearance="outline" subscriptSizing="dynamic" class="search">
+    <mat-label>{{ 'Пошук за номером або клієнтом' | t }}</mat-label>
+    <mat-icon matPrefix aria-hidden="true">search</mat-icon>
+    <input matInput type="search" [value]="search()" (input)="search.set($any($event.target).value)" />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" subscriptSizing="dynamic">
+    <mat-label>{{ 'Статус' | t }}</mat-label>
+    <mat-select [value]="status()" (valueChange)="status.set($event)">
+      <mat-option value="">{{ 'Усі статуси' | t }}</mat-option>
+      @for (s of statuses; track s.value) {
+        <mat-option [value]="s.value">{{ s.label | t }} ({{ counts().get(s.value) ?? 0 }})</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+</div>
+
+@if (service.loading()) {
+  <mat-progress-bar mode="indeterminate" [attr.aria-label]="'Завантаження…' | t" />
+}
+
+@if (errorKey(); as key) {
+  <p class="message error" role="alert">
+    <mat-icon aria-hidden="true">error</mat-icon>
+    {{ key | t }}
+  </p>
+} @else if (!service.loading() && !visible().length) {
+  <div class="empty">
+    <mat-icon aria-hidden="true">{{ filtered() ? 'search_off' : 'shopping_cart' }}</mat-icon>
+    @if (filtered()) {
+      <p>{{ 'Нічого не знайдено' | t }}</p>
+      <button mat-button (click)="resetFilters()">{{ 'Скинути фільтри' | t }}</button>
+    } @else {
+      <p>{{ 'Замовлень ще немає' | t }}</p>
+      <button mat-flat-button (click)="create()">{{ 'Створити перше замовлення' | t }}</button>
+    }
+  </div>
+} @else if (visible().length) {
+  <div class="table-wrap">
+    <table mat-table [dataSource]="visible()" [trackBy]="trackById">
+      <caption class="sr-only">{{ 'Список замовлень' | t }}</caption>
+
+      <ng-container matColumnDef="select">
+        <th mat-header-cell *matHeaderCellDef class="select">
+          <mat-checkbox
+            [checked]="selection.all()"
+            [indeterminate]="selection.some()"
+            (change)="selection.toggleAll()"
+            [attr.aria-label]="'Вибрати всі' | t"
+          />
+        </th>
+        <td mat-cell *matCellDef="let o" class="select">
+          <mat-checkbox
+            [checked]="selection.has(o.id)"
+            (change)="selection.toggle(o.id)"
+            [attr.aria-label]="'Вибрати замовлення №{n}' | t: { n: o.number }"
+          />
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="number">
+        <th mat-header-cell *matHeaderCellDef>№</th>
+        <td mat-cell *matCellDef="let o" class="strong">{{ o.number }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="date">
+        <th mat-header-cell *matHeaderCellDef>{{ 'Дата' | t }}</th>
+        <td mat-cell *matCellDef="let o" class="nowrap">{{ date(o) }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="customer">
+        <th mat-header-cell *matHeaderCellDef>{{ 'Клієнт' | t }}</th>
+        <td mat-cell *matCellDef="let o">
+          <span class="strong">{{ o.customerName }}</span>
+          @if (o.customerEmail) {
+            <span class="sub">{{ o.customerEmail }}</span>
+          }
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="items">
+        <th mat-header-cell *matHeaderCellDef class="num">{{ 'Товарів' | t }}</th>
+        <td mat-cell *matCellDef="let o" class="num">{{ itemCount(o) }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="total">
+        <th mat-header-cell *matHeaderCellDef class="num">{{ 'Сума' | t }}</th>
+        <td mat-cell *matCellDef="let o" class="num strong">{{ money(o.total) }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>{{ 'Статус' | t }}</th>
+        <td mat-cell *matCellDef="let o"><app-status-badge [status]="o.status" /></td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef><span class="sr-only">{{ 'Дії' | t }}</span></th>
+        <td mat-cell *matCellDef="let o" class="actions">
+          <button
+            mat-icon-button
+            (click)="open(o)"
+            [attr.aria-label]="'Відкрити замовлення №{n}' | t: { n: o.number }"
+            [matTooltip]="'Деталі' | t"
+          >
+            <mat-icon>visibility</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="columns"></tr>
+      <tr mat-row *matRowDef="let row; columns: columns" [class.selected]="selection.has(row.id)"></tr>
+    </table>
+  </div>
+}
+
+@if (selection.count()) {
+  <app-bulk-bar [count]="selection.count()" (clear)="selection.clear()">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="bulk-select">
+      <mat-label>{{ 'Змінити статус на' | t }}</mat-label>
+      <mat-select [value]="bulkStatus()" (valueChange)="bulkStatus.set($event)">
+        @for (s of bulkStatuses; track s.value) {
+          <mat-option [value]="s.value">{{ s.label | t }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <button mat-flat-button [disabled]="!bulkStatus() || bulkBusy()" (click)="applyBulk()">
+      {{ (bulkBusy() ? 'Збереження…' : 'Застосувати') | t }}
+    </button>
+  </app-bulk-bar>
+}

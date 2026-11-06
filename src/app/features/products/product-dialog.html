@@ -1,0 +1,96 @@
+<h2 mat-dialog-title>{{ (isNew ? 'Новий товар' : 'Редагування товару') | t }}</h2>
+
+<form [formRoot]="productForm">
+  <mat-dialog-content class="content">
+    <div class="photo">
+      @if (image(); as src) {
+        <img [src]="src" width="96" height="96" [alt]="'Фото товару' | t" />
+      } @else {
+        <div class="placeholder" aria-hidden="true"><mat-icon>image</mat-icon></div>
+      }
+      <div class="photo-actions">
+        <button mat-stroked-button type="button" (click)="fileInput.click()">
+          <mat-icon>upload</mat-icon>
+          {{ (image() ? 'Замінити фото' : 'Завантажити фото') | t }}
+        </button>
+        @if (image()) {
+          <button mat-button type="button" (click)="removeImage()">
+            <mat-icon>delete</mat-icon>
+            {{ 'Видалити фото' | t }}
+          </button>
+        }
+        <input #fileInput type="file" accept="image/*" hidden (change)="onFile($event)" />
+        @if (imageError()) {
+          <p class="error" role="alert">{{ 'Не вдалося обробити фото. Оберіть інший файл.' | t }}</p>
+        }
+      </div>
+    </div>
+
+    <mat-form-field appearance="outline" class="wide">
+      <mat-label>{{ 'Назва' | t }}</mat-label>
+      <input matInput [formField]="productForm.name" />
+      @if (productForm.name().errors()[0]; as e) {
+        <mat-error>{{ e.message ?? '' | t }}</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>{{ 'Артикул (SKU)' | t }}</mat-label>
+      <input matInput [formField]="productForm.sku" />
+      @if (productForm.sku().errors()[0]; as e) {
+        <mat-error>{{ e.message ?? '' | t }}</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>{{ 'Категорія' | t }}</mat-label>
+      <mat-select [formField]="productForm.categoryId">
+        @for (c of categories(); track c.id) {
+          <mat-option [value]="c.id">{{ c.name }}</mat-option>
+        }
+      </mat-select>
+      @if (productForm.categoryId().errors()[0]; as e) {
+        <mat-error>{{ e.message ?? '' | t }}</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>{{ 'Ціна, {currency}' | t: { currency: currency() } }}</mat-label>
+      <input matInput type="number" step="0.01" inputmode="decimal" [formField]="productForm.price" />
+      @if (productForm.price().errors()[0]; as e) {
+        <mat-error>{{ e.message ?? '' | t }}</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>{{ 'Залишок на складі, шт.' | t }}</mat-label>
+      <input matInput type="number" step="1" inputmode="numeric" [formField]="productForm.stock" />
+      @if (productForm.stock().errors()[0]; as e) {
+        <mat-error>{{ e.message ?? '' | t }}</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="wide">
+      <mat-label>{{ 'Опис' | t }}</mat-label>
+      <textarea matInput rows="3" [formField]="productForm.description"></textarea>
+      @if (productForm.description().errors()[0]; as e) {
+        <mat-error>{{ e.message ?? '' | t }}</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-slide-toggle class="wide" [formField]="productForm.active">
+      {{ 'Активний (показується в магазині)' | t }}
+    </mat-slide-toggle>
+
+    @if (saveError()) {
+      <p class="error wide" role="alert">{{ 'Не вдалося зберегти. Перевірте з’єднання й спробуйте ще раз.' | t }}</p>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" mat-dialog-close>{{ 'Скасувати' | t }}</button>
+    <button mat-flat-button type="submit" [disabled]="productForm().submitting()">
+      {{ (productForm().submitting() ? 'Збереження…' : 'Зберегти') | t }}
+    </button>
+  </mat-dialog-actions>
+</form>

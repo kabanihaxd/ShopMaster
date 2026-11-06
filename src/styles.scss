@@ -1,0 +1,122 @@
+@use '@angular/material' as mat;
+
+// Тема: по умолчанию тёмная (data-theme="dark" на <html>), светлая — data-theme="light".
+// Все цвета через light-dark(), поэтому достаточно переключить color-scheme.
+html {
+  height: 100%;
+  color-scheme: dark;
+
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$blue-palette,
+        tertiary: mat.$green-palette,
+      ),
+      typography: Roboto,
+      density: 0,
+    )
+  );
+
+  // Собственные токены приложения
+  --app-bg: light-dark(#f4f6fb, #000000);
+  --app-surface: light-dark(#ffffff, #0b0b0c);
+  --app-border: light-dark(#dde1e9, #2b2b2e);
+  --app-hover: light-dark(#eceff5, #161618);
+  --app-text: light-dark(#14161a, #f2f2f3);
+  --app-muted: light-dark(#5b6170, #a3a3aa);
+  --app-accent: #4263eb;
+  --app-active-text: light-dark(#2c47c4, #c7d2fe);
+  --app-success: light-dark(#13803a, #4ade80);
+  --app-success-bg: light-dark(#e3f5e9, #0e2a17);
+  --app-danger: light-dark(#c62828, #f87171);
+  --app-on-danger: light-dark(#ffffff, #1a0000);
+  --app-warning: light-dark(#a15c00, #fbbf24);
+  --app-radius: 12px;
+
+  @include mat.sidenav-overrides(
+    (
+      container-width: 264px,
+      container-background-color: var(--app-bg),
+      container-text-color: var(--app-text),
+      container-divider-color: var(--app-border),
+      content-background-color: var(--app-bg),
+      content-text-color: var(--app-text),
+    )
+  );
+
+  @include mat.card-overrides(
+    (
+      outlined-container-color: var(--app-surface),
+      outlined-outline-color: var(--app-border),
+      outlined-container-shape: var(--app-radius),
+    )
+  );
+}
+
+html[data-theme='light'] {
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  height: 100%;
+  background-color: var(--app-bg);
+  color: var(--app-text);
+  font: var(--mat-sys-body-medium);
+}
+
+// Кнопка опасного действия (удаление)
+.danger-button {
+  @include mat.button-overrides(
+    (
+      filled-container-color: var(--app-danger),
+      filled-label-text-color: var(--app-on-danger),
+    )
+  );
+}
+
+// Текст только для скринридеров
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+// Меню уведомлений шире стандартных 280px
+.notices-menu.mat-mdc-menu-panel {
+  width: 340px;
+  max-width: calc(100vw - 32px);
+}
+
+// ——— Анимация появления блоков ———
+// class="rise" + --i (порядковый номер) — блоки «всплывают» по очереди.
+// fill-mode backwards: после анимации transform свободен (hover-эффекты работают).
+@keyframes app-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.985);
+  }
+}
+.rise {
+  animation: app-rise 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
+  animation-delay: calc(var(--i, 0) * 60ms);
+}
+@media (prefers-reduced-motion: reduce) {
+  .rise {
+    animation: none;
+  }
+}
+
+// Окно глобального поиска (Ctrl+K)
+.command-palette-panel .mat-mdc-dialog-surface {
+  overflow: hidden;
+  border: 1px solid var(--app-border);
+  border-radius: 16px;
+  background: var(--app-surface);
+}

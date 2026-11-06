@@ -1,0 +1,99 @@
+.bell {
+  position: relative;
+}
+// Маленький счётчик на «плече» колокольчика (иконка 24px внутри кнопки 40px)
+.badge {
+  position: absolute;
+  top: 4px;
+  left: 21px;
+  display: grid;
+  place-items: center;
+  min-width: 16px;
+  height: 16px;
+  box-sizing: border-box;
+  padding: 0 4px;
+  border: 2px solid var(--app-bg);
+  border-radius: 999px;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.2px;
+  color: #fff;
+  background: light-dark(#c62828, #e5484d);
+  pointer-events: none;
+}
+
+.head {
+  margin: 0;
+  padding: 8px 16px 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--app-muted);
+}
+
+.notice {
+  height: auto;
+  min-height: 56px;
+  padding-block: 8px;
+}
+// mat-menu-item оборачивает содержимое в span — раскладываем его в строку
+.notice ::ng-deep .mat-mdc-menu-item-text {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+
+  mat-icon {
+    margin: 0;
+    width: 20px;
+    height: 20px;
+    font-size: 20px;
+    color: inherit;
+  }
+
+  &.info {
+    color: var(--app-active-text);
+    background: color-mix(in srgb, var(--app-accent) 18%, transparent);
+  }
+  &.warn {
+    color: var(--app-warning);
+    background: color-mix(in srgb, var(--app-warning) 16%, transparent);
+  }
+  &.danger {
+    color: var(--app-danger);
+    background: color-mix(in srgb, var(--app-danger) 16%, transparent);
+  }
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.title {
+  font-size: 14px;
+  font-weight: 500;
+}
+.text {
+  overflow: hidden;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--app-muted);
+}
+
+.empty,
+.more {
+  margin: 0;
+  padding: 8px 16px 10px;
+  font-size: 13px;
+  color: var(--app-muted);
+}

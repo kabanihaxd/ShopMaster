@@ -1,0 +1,87 @@
+<div class="head">
+  <p class="count" role="status">{{ 'Знайдено: {n}' | t: { n: visible().length } }}</p>
+</div>
+
+<div class="filters">
+  <mat-form-field appearance="outline" subscriptSizing="dynamic" class="search">
+    <mat-label>{{ 'Пошук за ім’ям, поштою або телефоном' | t }}</mat-label>
+    <mat-icon matPrefix aria-hidden="true">search</mat-icon>
+    <input matInput type="search" [value]="search()" (input)="search.set($any($event.target).value)" />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" subscriptSizing="dynamic">
+    <mat-label>{{ 'Сортування' | t }}</mat-label>
+    <mat-select [value]="sort()" (valueChange)="sort.set($event)">
+      @for (s of sorts; track s.key) {
+        <mat-option [value]="s.key">{{ s.label | t }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+</div>
+
+@if (service.loading()) {
+  <mat-progress-bar mode="indeterminate" [attr.aria-label]="'Завантаження…' | t" />
+}
+
+@if (errorKey(); as key) {
+  <p class="message error" role="alert">
+    <mat-icon aria-hidden="true">error</mat-icon>
+    {{ key | t }}
+  </p>
+} @else if (!service.loading() && !visible().length) {
+  <div class="empty">
+    <mat-icon aria-hidden="true">{{ search().trim() ? 'search_off' : 'group' }}</mat-icon>
+    @if (search().trim()) {
+      <p>{{ 'Нічого не знайдено' | t }}</p>
+    } @else {
+      <p>{{ 'Клієнтів ще немає' | t }}</p>
+      <span>{{ 'Клієнти з’являються, коли ви створюєте замовлення.' | t }}</span>
+    }
+  </div>
+} @else if (visible().length) {
+  <div class="table-wrap">
+    <table mat-table [dataSource]="visible()" [trackBy]="trackById">
+      <caption class="sr-only">{{ 'Список клієнтів' | t }}</caption>
+
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>{{ 'Клієнт' | t }}</th>
+        <td mat-cell *matCellDef="let c">
+          <a class="strong name" [routerLink]="['/customers', c.id]">{{ c.name }}</a>
+          @if (c.address) {
+            <span class="sub">{{ c.address }}</span>
+          }
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="contacts">
+        <th mat-header-cell *matHeaderCellDef>{{ 'Контакти' | t }}</th>
+        <td mat-cell *matCellDef="let c">
+          @if (c.email) {
+            <a [href]="'mailto:' + c.email">{{ c.email }}</a>
+          }
+          @if (c.phone) {
+            <a class="sub" [href]="'tel:' + c.phone">{{ c.phone }}</a>
+          }
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="orders">
+        <th mat-header-cell *matHeaderCellDef class="num">{{ 'Замовлень' | t }}</th>
+        <td mat-cell *matCellDef="let c" class="num">{{ c.stats.orders }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="spent">
+        <th mat-header-cell *matHeaderCellDef class="num">{{ 'Витратив' | t }}</th>
+        <td mat-cell *matCellDef="let c" class="num strong">{{ money(c.stats.spent) }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="last">
+        <th mat-header-cell *matHeaderCellDef>{{ 'Останнє замовлення' | t }}</th>
+        <td mat-cell *matCellDef="let c" class="nowrap">{{ date(c.stats.lastOrder) }}</td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="columns"></tr>
+      <tr mat-row *matRowDef="let row; columns: columns"></tr>
+    </table>
+  </div>
+}

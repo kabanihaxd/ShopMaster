@@ -1,0 +1,105 @@
+<div class="toolbar rise">
+  <mat-button-toggle-group
+    hideSingleSelectionIndicator
+    [value]="selected()"
+    (change)="selected.set($event.value)"
+    [attr.aria-label]="'Період' | t"
+  >
+    @for (p of periods; track p.days) {
+      <mat-button-toggle [value]="p.days">{{ p.label | t }}</mat-button-toggle>
+    }
+  </mat-button-toggle-group>
+
+  <button mat-stroked-button (click)="exportCsv()" [disabled]="!data().orders.length">
+    <mat-icon>download</mat-icon>
+    {{ 'Звіт CSV' | t }}
+  </button>
+</div>
+
+<section aria-labelledby="period-kpis">
+  <h2 id="period-kpis" class="sr-only">{{ 'Показники за період' | t }}</h2>
+  <div class="stats">
+    @for (k of kpis(); track k.label; let i = $index) {
+      <app-stat-card
+        class="rise"
+        [style.--i]="i + 1"
+        [label]="k.label"
+        [amount]="k.amount"
+        [format]="k.format"
+        [trend]="k.trend"
+        [icon]="k.icon"
+        [tone]="k.tone"
+        [change]="k.change"
+        [hint]="k.hint"
+      />
+    }
+  </div>
+</section>
+
+<app-panel heading="Дохід і замовлення" class="block rise" style="--i: 5">
+  <app-chart [config]="salesConfig()" [label]="salesLabel()" [height]="320" />
+</app-panel>
+
+<div class="row status-row">
+  <app-panel heading="Замовлення за статусами" class="rise" style="--i: 6">
+    @if (data().orders.length) {
+      <app-status-breakdown [statuses]="data().statuses" />
+    } @else {
+      <p class="empty">{{ 'Немає даних за цей період' | t }}</p>
+    }
+  </app-panel>
+
+  <app-panel heading="Дохід за категоріями" class="rise" style="--i: 7">
+    @if (hasCategories()) {
+      <app-chart [config]="categoryConfig()" [label]="categoryLabel()" [height]="categoryHeight()" />
+    } @else {
+      <p class="empty">{{ 'Немає даних за цей період' | t }}</p>
+    }
+  </app-panel>
+</div>
+
+<app-panel heading="Коли купують" class="block rise" style="--i: 8">
+  @if (data().orders.length) {
+    <app-heatmap [grid]="data().heatmap" />
+  } @else {
+    <p class="empty">{{ 'Немає даних за цей період' | t }}</p>
+  }
+</app-panel>
+
+<app-panel heading="Топ-10 товарів за період" class="block rise" style="--i: 9">
+  @if (top().length) {
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">{{ 'Товар' | t }}</th>
+            <th scope="col" class="num">{{ 'Продано, шт.' | t }}</th>
+            <th scope="col" class="num">{{ 'Дохід' | t }}</th>
+            <th scope="col" class="num">{{ 'Частка доходу' | t }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (p of top(); track p.productId; let i = $index) {
+            <tr>
+              <td>{{ i + 1 }}</td>
+              <td class="strong">{{ p.name }}</td>
+              <td class="num">{{ p.qty }}</td>
+              <td class="num">{{ p.revenueText }}</td>
+              <td class="num">
+                <span class="share">
+                  <span class="share-track" aria-hidden="true">
+                    <span class="share-bar" [style.width.%]="p.sharePct" [style.--d]="i * 70 + 'ms'"></span>
+                  </span>
+                  {{ p.share }}
+                </span>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <p class="empty">{{ 'Немає даних за цей період' | t }}</p>
+  }
+</app-panel>

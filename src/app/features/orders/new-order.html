@@ -1,0 +1,129 @@
+<h2 mat-dialog-title>{{ 'Нове замовлення' | t }}</h2>
+
+<form [formRoot]="orderForm">
+  <mat-dialog-content>
+    <fieldset>
+      <legend>{{ 'Клієнт' | t }}</legend>
+
+      <mat-button-toggle-group [formField]="orderForm.mode" [attr.aria-label]="'Клієнт' | t" class="mode">
+        <mat-button-toggle value="existing" [disabled]="!sortedCustomers().length">
+          {{ 'Існуючий' | t }}
+        </mat-button-toggle>
+        <mat-button-toggle value="new">{{ 'Новий' | t }}</mat-button-toggle>
+      </mat-button-toggle-group>
+
+      @if (orderForm.mode().value() === 'existing') {
+        <mat-form-field appearance="outline" class="wide">
+          <mat-label>{{ 'Оберіть клієнта' | t }}</mat-label>
+          <mat-select [formField]="orderForm.customerId" (selectionChange)="onCustomerPicked($event.value)">
+            @for (c of sortedCustomers(); track c.id) {
+              <mat-option [value]="c.id">{{ c.name }}{{ c.email ? ' · ' + c.email : '' }}</mat-option>
+            }
+          </mat-select>
+          @if (orderForm.customerId().errors()[0]; as e) {
+            <mat-error>{{ e.message ?? '' | t }}</mat-error>
+          }
+        </mat-form-field>
+      } @else {
+        <div class="grid">
+          <mat-form-field appearance="outline" class="wide">
+            <mat-label>{{ 'Ім’я та прізвище' | t }}</mat-label>
+            <input matInput autocomplete="off" [formField]="orderForm.name" />
+            @if (orderForm.name().errors()[0]; as e) {
+              <mat-error>{{ e.message ?? '' | t }}</mat-error>
+            }
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'Пошта' | t }}</mat-label>
+            <input matInput type="email" autocomplete="off" [formField]="orderForm.email" />
+            @if (orderForm.email().errors()[0]; as e) {
+              <mat-error>{{ e.message ?? '' | t }}</mat-error>
+            }
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'Телефон' | t }}</mat-label>
+            <input matInput type="tel" autocomplete="off" [formField]="orderForm.phone" />
+          </mat-form-field>
+        </div>
+      }
+
+      <mat-form-field appearance="outline" class="wide">
+        <mat-label>{{ 'Адреса доставки' | t }}</mat-label>
+        <input matInput autocomplete="off" [formField]="orderForm.address" />
+        @if (orderForm.address().errors()[0]; as e) {
+          <mat-error>{{ e.message ?? '' | t }}</mat-error>
+        }
+      </mat-form-field>
+    </fieldset>
+
+    <fieldset>
+      <legend>{{ 'Товари' | t }}</legend>
+
+      @for (item of orderForm.items; track $index; let i = $index) {
+        <div class="item">
+          <mat-form-field appearance="outline" class="product">
+            <mat-label>{{ 'Товар {n}' | t: { n: i + 1 } }}</mat-label>
+            <mat-select [formField]="item.productId">
+              @for (p of available(); track p.id) {
+                <mat-option [value]="p.id">{{ p.name }} · {{ p.sku }}</mat-option>
+              }
+            </mat-select>
+            @if (item.productId().errors()[0]; as e) {
+              <mat-error>{{ e.message ?? '' | t }}</mat-error>
+            } @else if (stockHint(item.productId().value()); as stock) {
+              <mat-hint>{{ 'На складі: {n} шт.' | t: { n: stock } }}</mat-hint>
+            }
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="qty">
+            <mat-label>{{ 'Кількість' | t }}</mat-label>
+            <input matInput type="number" step="1" inputmode="numeric" [formField]="item.qty" />
+            @if (item.qty().errors()[0]; as e) {
+              <mat-error>{{ e.message ?? '' | t }}</mat-error>
+            }
+          </mat-form-field>
+          <button
+            mat-icon-button
+            type="button"
+            class="remove"
+            [disabled]="orderForm.items().value().length === 1"
+            (click)="removeItem(i)"
+            [attr.aria-label]="'Прибрати товар {n}' | t: { n: i + 1 }"
+          >
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+      }
+
+      <button mat-stroked-button type="button" (click)="addItem()">
+        <mat-icon>add</mat-icon>
+        {{ 'Додати ще товар' | t }}
+      </button>
+      @if (!available().length) {
+        <p class="error">{{ 'Немає товарів у наявності.' | t }}</p>
+      }
+    </fieldset>
+
+    <mat-form-field appearance="outline" class="wide">
+      <mat-label>{{ 'Примітка (необов’язково)' | t }}</mat-label>
+      <textarea matInput rows="2" [formField]="orderForm.note"></textarea>
+      @if (orderForm.note().errors()[0]; as e) {
+        <mat-error>{{ e.message ?? '' | t }}</mat-error>
+      }
+    </mat-form-field>
+
+    <p class="total">
+      {{ 'Разом' | t }}: <strong>{{ total() }}</strong>
+    </p>
+
+    @if (saveError(); as err) {
+      <p class="error" role="alert">{{ err.key | t: err.params }}</p>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" mat-dialog-close>{{ 'Скасувати' | t }}</button>
+    <button mat-flat-button type="submit" [disabled]="orderForm().submitting()">
+      {{ (orderForm().submitting() ? 'Збереження…' : 'Створити замовлення') | t }}
+    </button>
+  </mat-dialog-actions>
+</form>

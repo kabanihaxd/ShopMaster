@@ -1,0 +1,144 @@
+.title {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+p {
+  margin: 0 0 4px;
+}
+
+.muted {
+  color: var(--app-muted);
+}
+
+.small {
+  display: block;
+  font-size: 12px;
+}
+
+.strong {
+  font-weight: 600;
+}
+
+a {
+  color: var(--app-active-text);
+}
+
+.block {
+  margin-top: 20px;
+
+  h3 {
+    margin: 0 0 8px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--app-muted);
+  }
+}
+
+.items {
+  width: 100%;
+  border-collapse: collapse;
+
+  th,
+  td {
+    padding: 8px 4px;
+    border-bottom: 1px solid var(--app-border);
+    text-align: left;
+  }
+
+  thead th {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--app-muted);
+  }
+
+  tfoot th,
+  tfoot td {
+    border-bottom: none;
+  }
+}
+
+.num {
+  text-align: right !important;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.status-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+
+  mat-form-field {
+    flex: 1 1 200px;
+  }
+}
+
+.error {
+  margin-top: 8px;
+  color: var(--app-danger);
+}
+
+// ——— История статусов: вертикальная лента ———
+.timeline {
+  position: relative;
+  margin: 0;
+  padding: 0 0 0 22px;
+  list-style: none;
+
+  // Линия, соединяющая точки
+  &::before {
+    content: '';
+    position: absolute;
+    top: 10px;
+    bottom: 10px;
+    left: 5px;
+    width: 2px;
+    border-radius: 1px;
+    background: var(--app-border);
+  }
+
+  li {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 10px;
+    padding: 6px 0;
+  }
+
+  .dot {
+    position: absolute;
+    top: 50%;
+    left: -22px;
+    width: 12px;
+    height: 12px;
+    margin-top: -6px;
+    box-sizing: border-box;
+    border: 2px solid var(--app-border);
+    border-radius: 50%;
+    background: var(--app-surface);
+  }
+
+  // Текущий статус — заполненная точка с мягким свечением
+  li.current .dot {
+    border-color: var(--app-accent);
+    background: var(--app-accent);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--app-accent) 25%, transparent);
+  }
+
+  time {
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .by {
+    font-size: 12px;
+    color: var(--app-muted);
+  }
+}

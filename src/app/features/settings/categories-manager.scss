@@ -1,0 +1,47 @@
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+li {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 56px;
+  border-bottom: 1px solid var(--app-border);
+}
+
+.grow {
+  flex: 1;
+  min-width: 0;
+}
+
+.name {
+  display: block;
+  font-weight: 500;
+}
+
+.sub {
+  font-size: 12px;
+  color: var(--app-muted);
+}
+
+.add {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 16px;
+
+  button {
+    margin-top: 8px;
+  }
+}
+
+.error {
+  color: var(--app-danger);
+}
+
+p.error {
+  margin: 12px 0 0;
+}

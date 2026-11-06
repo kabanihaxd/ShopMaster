@@ -1,0 +1,125 @@
+:host {
+  display: block;
+}
+
+.peak {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 14px;
+  font-size: 14px;
+  color: var(--app-muted);
+}
+// Пульсирующая точка у «пика»
+.pulse {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--app-accent);
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: var(--app-accent);
+    animation: ping 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+  }
+}
+@keyframes ping {
+  75%,
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+
+.wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  min-width: 560px;
+  border-collapse: separate;
+  border-spacing: 3px;
+  table-layout: fixed;
+}
+
+th {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--app-muted);
+}
+thead th {
+  height: 18px;
+  text-align: left;
+}
+tbody th {
+  width: 36px;
+  padding-right: 6px;
+  text-align: right;
+  white-space: nowrap;
+}
+td {
+  padding: 0;
+}
+
+.cell {
+  display: block;
+  height: 22px;
+  border-radius: 5px;
+  background: color-mix(
+    in srgb,
+    var(--app-accent) calc(var(--level, 0) * 100%),
+    light-dark(#eef0f5, #17171a)
+  );
+  transition: transform 0.15s ease;
+  animation: pop 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
+  animation-delay: var(--d, 0ms);
+
+  &:hover {
+    transform: scale(1.25);
+    position: relative;
+    z-index: 1;
+    outline: 2px solid var(--app-surface);
+  }
+}
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+}
+
+.legend {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--app-muted);
+
+  .cell {
+    width: 16px;
+    height: 12px;
+    border-radius: 3px;
+    animation: none;
+  }
+  span:first-child {
+    margin-right: 4px;
+  }
+  span:last-child {
+    margin-left: 4px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cell,
+  .pulse::after {
+    animation: none;
+    transition: none;
+  }
+}

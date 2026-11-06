@@ -1,0 +1,114 @@
+// Общие стили страниц-списков (товары, заказы, клиенты)
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+  min-height: 40px;
+}
+
+.count {
+  margin: 0;
+  color: var(--app-muted);
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+
+  mat-form-field {
+    flex: 1 1 200px;
+  }
+
+  .search {
+    flex: 2 1 280px;
+  }
+}
+
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius);
+  background: var(--app-surface);
+}
+
+table {
+  width: 100%;
+  background: transparent;
+}
+
+.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+.strong {
+  font-weight: 500;
+}
+
+.sub {
+  display: block;
+  font-size: 12px;
+  color: var(--app-muted);
+}
+
+.actions {
+  white-space: nowrap;
+  text-align: right;
+}
+
+.message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  &.error {
+    color: var(--app-danger);
+  }
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 48px 16px;
+  border: 1px dashed var(--app-border);
+  border-radius: var(--app-radius);
+  color: var(--app-muted);
+  text-align: center;
+
+  mat-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 40px;
+  }
+
+  p {
+    margin: 0;
+    font-size: 16px;
+  }
+}
+
+// ——— Выделение строк для массовых действий ———
+.select {
+  width: 48px;
+  padding-right: 0 !important;
+}
+
+tr.selected {
+  background: color-mix(in srgb, var(--app-accent) 10%, transparent);
+}
+
+// Поле выбора внутри плавающей панели массовых действий
+.bulk-select {
+  width: 220px;
+}

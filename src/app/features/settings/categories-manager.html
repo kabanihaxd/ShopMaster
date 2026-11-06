@@ -1,0 +1,71 @@
+<app-panel heading="Категорії">
+  <ul>
+    @for (c of service.categories(); track c.id) {
+      <li>
+        @if (editingId() === c.id) {
+          <mat-form-field appearance="outline" subscriptSizing="dynamic" class="grow">
+            <mat-label>{{ 'Нова назва' | t }}</mat-label>
+            <input
+              matInput
+              [value]="editName()"
+              (input)="editName.set($any($event.target).value)"
+              (keydown.enter)="saveEdit(c)"
+              (keydown.escape)="editingId.set(null)"
+            />
+            @if (editError()) {
+              <mat-hint class="error">{{ editError() | t }}</mat-hint>
+            }
+          </mat-form-field>
+          <button mat-icon-button (click)="saveEdit(c)" [attr.aria-label]="'Зберегти' | t">
+            <mat-icon>check</mat-icon>
+          </button>
+          <button mat-icon-button (click)="editingId.set(null)" [attr.aria-label]="'Скасувати' | t">
+            <mat-icon>close</mat-icon>
+          </button>
+        } @else {
+          <div class="grow">
+            <span class="name">{{ c.name }}</span>
+            <span class="sub">{{ 'Товарів: {n}' | t: { n: count(c) } }}</span>
+          </div>
+          <button
+            mat-icon-button
+            (click)="startEdit(c)"
+            [attr.aria-label]="'Перейменувати «{name}»' | t: { name: c.name }"
+            [matTooltip]="'Перейменувати' | t"
+          >
+            <mat-icon>edit</mat-icon>
+          </button>
+          <!-- Обёртка нужна, чтобы подсказка показывалась и у неактивной кнопки -->
+          <span [matTooltip]="count(c) ? ('Спочатку перенесіть товари з цієї категорії' | t) : ('Видалити' | t)">
+            <button
+              mat-icon-button
+              [disabled]="count(c) > 0"
+              (click)="remove(c)"
+              [attr.aria-label]="'Видалити «{name}»' | t: { name: c.name }"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+          </span>
+        }
+      </li>
+    }
+  </ul>
+
+  <form class="add" (submit)="add($event)">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="grow">
+      <mat-label>{{ 'Нова категорія' | t }}</mat-label>
+      <input matInput [value]="newName()" (input)="newName.set($any($event.target).value)" />
+      @if (addError()) {
+        <mat-hint class="error">{{ addError() | t }}</mat-hint>
+      }
+    </mat-form-field>
+    <button mat-stroked-button type="submit">
+      <mat-icon>add</mat-icon>
+      {{ 'Додати' | t }}
+    </button>
+  </form>
+
+  @if (failed()) {
+    <p class="error" role="alert">{{ 'Не вдалося зберегти. Перевірте з’єднання й спробуйте ще раз.' | t }}</p>
+  }
+</app-panel>
