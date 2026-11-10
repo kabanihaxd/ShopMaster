@@ -3,6 +3,7 @@ import { doc, onSnapshot, setDoc } from 'firebase/firestore';
 import { AuthService } from './auth';
 import { CurrencyCode, isCurrency, setCurrency } from './format';
 import { db } from './firestore';
+import { ReadOnlyGuard } from './read-only';
 
 export interface StoreSettings {
   currency: CurrencyCode;
@@ -18,6 +19,7 @@ const DEFAULTS: StoreSettings = { currency: 'USD', lowStockThreshold: 10 };
 @Service()
 export class SettingsService {
   private readonly auth = inject(AuthService);
+  private readonly guard = inject(ReadOnlyGuard);
 
   readonly currency = signal<CurrencyCode>(DEFAULTS.currency);
   /** Остаток, при котором (и ниже) товар считается заканчивающимся */
@@ -45,6 +47,7 @@ export class SettingsService {
   }
 
   async save(settings: StoreSettings): Promise<void> {
+    this.guard.check();
     await setDoc(doc(db(), 'settings', 'store'), settings, { merge: true });
   }
 }

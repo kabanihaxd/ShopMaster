@@ -21,6 +21,7 @@ import { TPipe } from '../../i18n/i18n';
 import { CategoriesService } from './categories.service';
 import { emptyProduct, Product, ProductInput } from './product';
 import { ProductsService } from './products.service';
+import { isReadOnly } from '../../core/read-only';
 
 export interface ProductDialogData {
   /** Нет товара — создаём новый */
@@ -95,8 +96,8 @@ export class ProductDialog {
             if (this.editing) await this.products.update(this.editing.id, input);
             else await this.products.add(input);
             this.ref.close(true);
-          } catch {
-            this.saveError.set(true);
+          } catch (e) {
+            if (!isReadOnly(e)) this.saveError.set(true);
           }
           return undefined;
         },

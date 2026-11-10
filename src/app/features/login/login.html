@@ -65,6 +65,15 @@
             {{ 'Забули пароль?' | t }}
           </button>
         </form>
+
+        <div class="divider" aria-hidden="true"><span>{{ 'або' | t }}</span></div>
+
+        <button mat-stroked-button type="button" class="guest" [disabled]="guestBusy()" (click)="signInAsGuest()">
+          <mat-icon>visibility</mat-icon>
+          {{ (guestBusy() ? 'Вхід…' : 'Переглянути як гість') | t }}
+        </button>
+        <p class="guest-hint">{{ 'Демо-доступ без реєстрації: усі сторінки відкриті для перегляду, зміни вимкнено.' | t }}</p>
+
         <p class="hint">{{ 'Облікові записи менеджерів створюються в Firebase Console.' | t }}</p>
       } @else {
         <div class="setup">

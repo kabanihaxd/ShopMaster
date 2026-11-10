@@ -10,6 +10,7 @@ import {
 } from 'firebase/firestore';
 import { AuthService } from '../../core/auth';
 import { db, liveCollection } from '../../core/firestore';
+import { ReadOnlyGuard } from '../../core/read-only';
 import { allowedStatuses, Order, OrderItem, OrderStatus, toOrder } from './order';
 
 /** Данные для ручного создания заказа */
@@ -36,6 +37,7 @@ export class OrderError extends Error {
 export class OrdersService {
   private readonly live = liveCollection('orders', toOrder);
   private readonly auth = inject(AuthService);
+  private readonly guard = inject(ReadOnlyGuard);
 
   /** Сначала новые */
   readonly orders = computed(() =>
@@ -49,6 +51,7 @@ export class OrdersService {
    * выдаёт следующий номер, при необходимости создаёт клиента. Возвращает номер заказа.
    */
   async create(input: NewOrder): Promise<number> {
+    this.guard.check();
     // Одинаковые товары в нескольких строках складываем
     const qtyById = new Map<string, number>();
     for (const i of input.items) qtyById.set(i.productId, (qtyById.get(i.productId) ?? 0) + i.qty);
@@ -121,6 +124,7 @@ export class OrdersService {
 
   /** Сменить статус. При отмене товары возвращаются на склад (если они ещё существуют). */
   async setStatus(order: Order, status: OrderStatus): Promise<void> {
+    this.guard.check();
     const database = db();
     const orderRef = doc(database, 'orders', order.id);
 
@@ -150,6 +154,7 @@ export class OrdersService {
    * (завершённые или «назад по цепочке»), пропускаются. Возвращает число обновлённых и пропущенных.
    */
   async setStatusMany(orders: Order[], status: OrderStatus): Promise<{ updated: number; skipped: number }> {
+    this.guard.check();
     let updated = 0;
     let skipped = 0;
     for (const order of orders) {

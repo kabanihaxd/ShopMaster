@@ -1,6 +1,8 @@
 import { computed, effect, inject, Service } from '@angular/core';
 import { addDoc, collection, deleteDoc, doc, DocumentData, setDoc, updateDoc } from 'firebase/firestore';
+import { AuthService } from '../../core/auth';
 import { db, liveCollection } from '../../core/firestore';
+import { ReadOnlyGuard } from '../../core/read-only';
 import { t } from '../../i18n/i18n';
 import { Category } from './product';
 import { ProductsService } from './products.service';
@@ -21,6 +23,8 @@ const toCategory = (id: string, d: DocumentData): Category => ({ id, name: Strin
 export class CategoriesService {
   private readonly live = liveCollection('categories', toCategory);
   private readonly products = inject(ProductsService);
+  private readonly auth = inject(AuthService);
+  private readonly guard = inject(ReadOnlyGuard);
 
   readonly categories = computed(() =>
     [...this.live.data()].sort((a, b) => a.name.localeCompare(b.name)),
@@ -39,7 +43,7 @@ export class CategoriesService {
   constructor() {
     let seeded = false;
     effect(() => {
-      if (seeded || this.live.loading() || this.live.error() || this.live.data().length) return;
+      if (seeded || this.auth.isGuest() || this.live.loading() || this.live.error() || this.live.data().length) return;
       seeded = true;
       for (const c of DEFAULT_CATEGORIES) {
         void setDoc(doc(db(), 'categories', c.id), { name: t(c.name) });
@@ -54,15 +58,18 @@ export class CategoriesService {
   }
 
   async add(name: string): Promise<void> {
+    this.guard.check();
     await addDoc(collection(db(), 'categories'), { name: name.trim() });
   }
 
   async rename(id: string, name: string): Promise<void> {
+    this.guard.check();
     await updateDoc(doc(db(), 'categories', id), { name: name.trim() });
   }
 
   /** Удалять можно только пустую категорию (проверяется в интерфейсе) */
   async remove(id: string): Promise<void> {
+    this.guard.check();
     await deleteDoc(doc(db(), 'categories', id));
   }
 }

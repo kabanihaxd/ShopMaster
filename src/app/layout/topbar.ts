@@ -2,6 +2,7 @@ import { Component, inject, input, output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { Router } from '@angular/router';
 import { AuthService } from '../core/auth';
 import { TPipe } from '../i18n/i18n';
@@ -13,7 +14,7 @@ import { ThemeToggle } from './theme-toggle';
 /** Верхняя панель: заголовок страницы, язык, тема и аккаунт */
 @Component({
   selector: 'app-topbar',
-  imports: [MatButtonModule, MatIconModule, MatMenuModule, TPipe, LangSwitch, Notifications, ThemeToggle],
+  imports: [MatButtonModule, MatIconModule, MatMenuModule, MatTooltipModule, TPipe, LangSwitch, Notifications, ThemeToggle],
   template: `
     <header>
       @if (showMenuButton()) {
@@ -22,6 +23,12 @@ import { ThemeToggle } from './theme-toggle';
         </button>
       }
       <h1>{{ pageTitle() | t }}</h1>
+      @if (auth.isGuest()) {
+        <span class="demo" [matTooltip]="'Демо-доступ: можна лише переглядати дані' | t">
+          <mat-icon aria-hidden="true">visibility</mat-icon>
+          <span>{{ 'Демо · перегляд' | t }}</span>
+        </span>
+      }
       <span class="spacer"></span>
 
       <button type="button" class="search" (click)="search.open()" [attr.aria-label]="'Пошук (Ctrl+K)' | t">
@@ -43,7 +50,7 @@ import { ThemeToggle } from './theme-toggle';
           <mat-icon>account_circle</mat-icon>
         </button>
         <mat-menu #accountMenu="matMenu" xPosition="before">
-          <p class="email">{{ user.email }}</p>
+          <p class="email">{{ auth.isGuest() ? ('Гість · лише перегляд' | t) : user.email }}</p>
           <button mat-menu-item (click)="signOut()">
             <mat-icon aria-hidden="true">logout</mat-icon>
             {{ 'Вийти' | t }}
@@ -75,6 +82,26 @@ import { ThemeToggle } from './theme-toggle';
     }
     .spacer {
       flex: 1;
+    }
+    .demo {
+      display: inline-flex;
+      flex-shrink: 0;
+      align-items: center;
+      gap: 6px;
+      margin-left: 12px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--app-accent) 14%, transparent);
+      color: var(--app-text);
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .demo mat-icon {
+      width: 16px;
+      height: 16px;
+      font-size: 16px;
+      color: var(--app-accent);
     }
     .search {
       display: flex;
@@ -136,6 +163,13 @@ import { ThemeToggle } from './theme-toggle';
       .search-text,
       kbd {
         display: none;
+      }
+      .demo span {
+        display: none;
+      }
+      .demo {
+        padding: 6px;
+        margin-left: 8px;
       }
     }
     @media (max-width: 599px) {

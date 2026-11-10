@@ -9,6 +9,7 @@ import { CURRENCIES } from '../../core/format';
 import { SettingsService, StoreSettings } from '../../core/settings';
 import { t, TPipe } from '../../i18n/i18n';
 import { Panel } from '../../shared/panel';
+import { isReadOnly } from '../../core/read-only';
 
 /** Общие настройки магазина: валюта и порог низкого остатка */
 @Component({
@@ -96,8 +97,8 @@ export class StoreSettingsPanel {
             await this.settings.save(this.model());
             this.settingsForm().reset();
             this.snackBar.open(t('Налаштування збережено'), t('Закрити'), { duration: 3000 });
-          } catch {
-            this.error.set(true);
+          } catch (e) {
+            if (!isReadOnly(e)) this.error.set(true);
           }
           return undefined;
         },

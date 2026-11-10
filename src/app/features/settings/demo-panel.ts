@@ -4,6 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { ReadOnlyGuard } from '../../core/read-only';
 import { t, TPipe } from '../../i18n/i18n';
 import { confirmAction } from '../../shared/confirm-dialog';
 import { Panel } from '../../shared/panel';
@@ -63,6 +64,7 @@ export class DemoPanel implements OnInit {
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
   private readonly categories = inject(CategoriesService);
+  private readonly guard = inject(ReadOnlyGuard);
 
   /** null — ещё проверяем */
   protected readonly hasDemo = signal<boolean | null>(null);
@@ -78,6 +80,7 @@ export class DemoPanel implements OnInit {
   }
 
   protected async create() {
+    if (this.readOnly()) return;
     await this.run(async () => {
       const ids = new Set(this.categories.categories().map((c) => c.id));
       const count = await createDemoData(ids);
@@ -87,6 +90,7 @@ export class DemoPanel implements OnInit {
   }
 
   protected async remove() {
+    if (this.readOnly()) return;
     const ok = await confirmAction(this.dialog, {
       title: 'Видалити демо-дані?',
       message: 'Буде видалено всі демо-товари, демо-клієнтів і демо-замовлення. Ваші власні дані залишаться.',
@@ -98,6 +102,16 @@ export class DemoPanel implements OnInit {
       this.hasDemo.set(false);
       this.snackBar.open(t('Демо-дані видалено'), t('Закрити'), { duration: 4000 });
     });
+  }
+
+  /** Гостю показываем сообщение и ничего не делаем */
+  private readOnly(): boolean {
+    try {
+      this.guard.check();
+      return false;
+    } catch {
+      return true;
+    }
   }
 
   private async run(action: () => Promise<void>) {

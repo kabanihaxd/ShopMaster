@@ -85,6 +85,30 @@ h1 {
   }
 }
 
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 16px 0;
+  font-size: 13px;
+  color: var(--app-muted);
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--app-border);
+  }
+}
+
+.guest-hint {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: var(--app-muted);
+  text-align: center;
+}
+
 .hint {
   margin: 16px 0 0;
   font-size: 13px;

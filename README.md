@@ -2,7 +2,7 @@
 
 Панель, в которой менеджер управляет товарами, заказами, клиентами и смотрит аналитику продаж.
 
-**Демо:** https://shopmaster-bdccc.web.app (вход только для менеджеров, аккаунты создаются в Firebase Console)
+**Демо:** https://shopmaster-bdccc.web.app — кнопка «Переглянути як гість» открывает панель в режиме только для просмотра (запись для демо-аккаунта запрещена правилами Firestore).
 
 ## Возможности
 
@@ -28,7 +28,7 @@ npx ng test         # unit-тесты
 npx ng build        # сборка в dist/ShopMaster/browser
 ```
 
-Конфигурация Firebase — `src/app/core/firebase-config.ts`. Правила доступа к Firestore — `firestore.rules`: читать и писать могут только вошедшие пользователи.
+Конфигурация Firebase — `src/app/core/firebase-config.ts`. Правила доступа к Firestore — `firestore.rules`: читать могут все вошедшие, писать — только менеджеры (не демо-аккаунт).
 
 ## Публикация
 

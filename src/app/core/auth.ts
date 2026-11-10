@@ -1,4 +1,4 @@
-import { Service, signal } from '@angular/core';
+import { computed, Service, signal } from '@angular/core';
 import {
   getAuth,
   onAuthStateChanged,
@@ -8,6 +8,13 @@ import {
   User,
 } from 'firebase/auth';
 import { firebaseApp, firebaseConfigured } from './firebase';
+
+/**
+ * Демо-аккаунт для посетителей портфолио: кнопка «Переглянути як гість» входит под ним.
+ * Пароль публичный (он всё равно попадает в сборку) — защита на стороне Firestore:
+ * правила запрещают этому аккаунту любую запись (проверка по uid, см. firestore.rules).
+ */
+export const DEMO_ACCOUNT = { email: 'demo@shopmaster.app', password: 'ShopMaster-demo-2026' };
 
 /** Коды ошибок Firebase Auth → ключи перевода */
 const AUTH_ERRORS: Record<string, string> = {
@@ -19,7 +26,8 @@ const AUTH_ERRORS: Record<string, string> = {
   'auth/user-disabled': 'Цей обліковий запис вимкнено',
   'auth/too-many-requests': 'Забагато спроб. Зачекайте трохи й спробуйте ще раз.',
   'auth/network-request-failed': 'Немає зв’язку з інтернетом',
-  'auth/operation-not-allowed': 'Вхід за паролем ще не ввімкнено в Firebase',
+  'auth/operation-not-allowed': 'Цей спосіб входу ще не ввімкнено в Firebase',
+  'auth/admin-restricted-operation': 'Цей спосіб входу ще не ввімкнено в Firebase',
 };
 
 /** Ключ перевода для ошибки входа */
@@ -38,6 +46,9 @@ export class AuthService {
 
   /** undefined — Firebase ещё проверяет сохранённый вход; null — не вошли */
   readonly user = signal<User | null | undefined>(firebaseConfigured ? undefined : null);
+
+  /** Гость портфолио (демо-аккаунт): только просмотр */
+  readonly isGuest = computed(() => this.user()?.email === DEMO_ACCOUNT.email);
 
   /** Резолвится, когда стало известно, вошёл ли пользователь */
   readonly ready: Promise<void>;
@@ -58,6 +69,11 @@ export class AuthService {
   async signIn(email: string, password: string): Promise<void> {
     if (!this.auth) return;
     await signInWithEmailAndPassword(this.auth, email.trim(), password);
+  }
+
+  /** Вход под демо-аккаунтом — посмотреть админку в режиме «только просмотр» */
+  async signInAsGuest(): Promise<void> {
+    await this.signIn(DEMO_ACCOUNT.email, DEMO_ACCOUNT.password);
   }
 
   async resetPassword(email: string): Promise<void> {

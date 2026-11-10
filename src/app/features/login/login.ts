@@ -45,6 +45,7 @@ export default class Login {
   protected readonly configured = firebaseConfigured;
   protected readonly showPassword = signal(false);
   protected readonly notice = signal<Notice | null>(null);
+  protected readonly guestBusy = signal(false);
 
   private readonly model = signal({ email: '', password: '' });
 
@@ -71,6 +72,20 @@ export default class Login {
       },
     },
   );
+
+  /** Гость портфолио: анонимный вход, только просмотр */
+  protected async signInAsGuest() {
+    this.notice.set(null);
+    this.guestBusy.set(true);
+    try {
+      await this.auth.signInAsGuest();
+      await this.router.navigateByUrl('/dashboard');
+    } catch (e) {
+      this.notice.set({ kind: 'error', key: authErrorKey(e) });
+    } finally {
+      this.guestBusy.set(false);
+    }
+  }
 
   protected async resetPassword() {
     const field = this.loginForm.email();

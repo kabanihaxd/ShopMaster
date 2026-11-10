@@ -140,8 +140,16 @@ export default class Orders {
       if (!ok) return;
     }
     this.bulkBusy.set(true);
-    const { updated, skipped } = await this.service.setStatusMany(orders, status);
-    this.bulkBusy.set(false);
+    let result: { updated: number; skipped: number };
+    try {
+      result = await this.service.setStatusMany(orders, status);
+    } catch {
+      // гостевой режим: сообщение уже показано
+      return;
+    } finally {
+      this.bulkBusy.set(false);
+    }
+    const { updated, skipped } = result;
     this.selection.clear();
     this.bulkStatus.set(null);
     const message = skipped

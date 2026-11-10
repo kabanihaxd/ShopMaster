@@ -21,6 +21,7 @@ import { Params, TPipe } from '../../i18n/i18n';
 import { CustomersService } from '../customers/customers.service';
 import { ProductsService } from '../products/products.service';
 import { NewOrder, OrderError, OrdersService } from './orders.service';
+import { isReadOnly } from '../../core/read-only';
 
 interface OrderModel {
   mode: 'existing' | 'new';
@@ -119,7 +120,7 @@ export class NewOrderDialog {
             const number = await this.orders.create(this.toNewOrder());
             this.ref.close(number);
           } catch (e) {
-            this.saveError.set(this.errorMessage(e));
+            if (!isReadOnly(e)) this.saveError.set(this.errorMessage(e));
           }
           return undefined;
         },

@@ -47,10 +47,10 @@ export const APP: Entry[] = [
   ],
   ['Немає зв’язку з інтернетом', 'Нет связи с интернетом', 'No internet connection', 'Žiadne pripojenie k internetu'],
   [
-    'Вхід за паролем ще не ввімкнено в Firebase',
-    'Вход по паролю ещё не включён в Firebase',
-    'Password sign-in is not enabled in Firebase yet',
-    'Prihlásenie heslom ešte nie je vo Firebase zapnuté',
+    'Цей спосіб входу ще не ввімкнено в Firebase',
+    'Этот способ входа ещё не включён в Firebase',
+    'This sign-in method is not enabled in Firebase yet',
+    'Tento spôsob prihlásenia ešte nie je vo Firebase zapnutý',
   ],
   [
     'Не вдалося увійти. Спробуйте ще раз.',
@@ -555,4 +555,28 @@ export const APP: Entry[] = [
   ['Дякуємо за покупку!', 'Спасибо за покупку!', 'Thank you for your purchase!', 'Ďakujeme za nákup!'],
   ['Надруковано {date}', 'Напечатано {date}', 'Printed {date}', 'Vytlačené {date}'],
   ['Замовлення не знайдено', 'Заказ не найден', 'Order not found', 'Objednávka sa nenašla'],
+
+  // — гостевой (демо) доступ —
+  ['або', 'или', 'or', 'alebo'],
+  ['Переглянути як гість', 'Посмотреть как гость', 'View as guest', 'Pozrieť ako hosť'],
+  [
+    'Демо-доступ без реєстрації: усі сторінки відкриті для перегляду, зміни вимкнено.',
+    'Демо-доступ без регистрации: все страницы открыты для просмотра, изменения отключены.',
+    'Demo access without sign-up: every page is open to browse, changes are disabled.',
+    'Demo prístup bez registrácie: všetky stránky sú otvorené na prezeranie, zmeny sú vypnuté.',
+  ],
+  ['Демо · перегляд', 'Демо · просмотр', 'Demo · view only', 'Demo · len prezeranie'],
+  [
+    'Демо-доступ: можна лише переглядати дані',
+    'Демо-доступ: можно только просматривать данные',
+    'Demo access: you can only view the data',
+    'Demo prístup: údaje je možné iba prezerať',
+  ],
+  ['Гість · лише перегляд', 'Гость · только просмотр', 'Guest · view only', 'Hosť · len prezeranie'],
+  [
+    'Демо-режим: зміни недоступні. Тут можна лише переглядати дані.',
+    'Демо-режим: изменения недоступны. Здесь можно только просматривать данные.',
+    'Demo mode: changes are disabled. You can only view the data here.',
+    'Demo režim: zmeny nie sú dostupné. Údaje je tu možné iba prezerať.',
+  ],
 ];

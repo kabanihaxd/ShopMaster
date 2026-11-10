@@ -10,6 +10,7 @@ import { confirmAction } from '../../shared/confirm-dialog';
 import { Panel } from '../../shared/panel';
 import { CategoriesService } from '../products/categories.service';
 import { Category } from '../products/product';
+import { isReadOnly } from '../../core/read-only';
 
 /** Управление категориями: добавить, переименовать, удалить пустую */
 @Component({
@@ -79,8 +80,8 @@ export class CategoriesManager {
     this.failed.set(false);
     try {
       await action();
-    } catch {
-      this.failed.set(true);
+    } catch (e) {
+      if (!isReadOnly(e)) this.failed.set(true);
     }
   }
 }

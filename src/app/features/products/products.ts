@@ -22,6 +22,7 @@ import { Product } from './product';
 import { ProductDialog, ProductDialogData } from './product-dialog';
 import { ProductsService } from './products.service';
 import { StockStepper } from './stock-stepper';
+import { isReadOnly } from '../../core/read-only';
 
 type SortKey = 'name' | 'price-asc' | 'price-desc' | 'stock-asc';
 
@@ -131,8 +132,8 @@ export default class Products {
       await action();
       this.selection.clear();
       this.snackBar.open(t(done, { n }), t('Закрити'), { duration: 4000 });
-    } catch {
-      this.toast('Не вдалося виконати дію. Спробуйте ще раз.');
+    } catch (e) {
+      if (!isReadOnly(e)) this.toast('Не вдалося виконати дію. Спробуйте ще раз.');
     } finally {
       this.bulkBusy.set(false);
     }
@@ -186,16 +187,16 @@ export default class Products {
     try {
       await this.service.remove(product.id);
       this.toast('Товар «{name}» видалено', product.name);
-    } catch {
-      this.toast('Не вдалося видалити товар');
+    } catch (e) {
+      if (!isReadOnly(e)) this.toast('Не вдалося видалити товар');
     }
   }
 
   protected async changeStock(product: Product, delta: number) {
     try {
       await this.service.changeStock(product, delta);
-    } catch {
-      this.toast('Не вдалося змінити залишок');
+    } catch (e) {
+      if (!isReadOnly(e)) this.toast('Не вдалося змінити залишок');
     }
   }
 

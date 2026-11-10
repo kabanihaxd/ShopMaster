@@ -11,6 +11,7 @@ import { confirmAction } from '../../shared/confirm-dialog';
 import { allowedStatuses, Order, OrderStatus, STATUS_LABEL } from './order';
 import { OrdersService } from './orders.service';
 import { StatusBadge } from './status-badge';
+import { isReadOnly } from '../../core/read-only';
 
 /** Карточка заказа: состав, клиент, адрес и смена статуса */
 @Component({
@@ -71,8 +72,8 @@ export class OrderDetails {
     try {
       await this.service.setStatus(this.order(), status);
       this.next.set(null);
-    } catch {
-      this.error.set(true);
+    } catch (e) {
+      if (!isReadOnly(e)) this.error.set(true);
     } finally {
       this.saving.set(false);
     }
